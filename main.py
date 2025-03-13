@@ -11,31 +11,39 @@ class Exceptions:
 
 class Game:
     class Player:   #Подкласс для реального игрока
+        def __init__(self,name):
+            self.name=name
+        def get_coordinates(self):
+            x=input(f'{self.name}, введите координаты (A-F): ').upper()
+            y=input(f'{self.name}, введите координаты (1-6): ')
+            return x,y
+        def choose_directions(self):
+            while True:
+                direction=input('Выбирете направление (H-горизонтально или V-вертикально)')
+                if direction in ("H","v"):
+                    return direction
+                else:
+                    print("Ошибка ввода! В  ведите корректное значение!")
+
+
+
+    class AIPlayer:   #Подкласс для ИИ
         def __init__(self):
-            self.x = None
-            self.y = None
-            self.direction = None
+            self.name= "AI"
 
         def get_coordinates(self):
-            self.x = input("Введите координату буквы (A-F): ").upper()
-            self.y = input("Введите координату цифры (1-6): ")
-            self.direction = input("Введите направление (H - горизонтально, V - вертикально): ").upper()
-    class AIplayer:   #Подкласс для ИИ
-        def __init__(self):
-            self.x = None
-            self.y = None
-            self.direction = None
-        def get_coordinates(self):
-            self.x = random.choice(["A","B","C","D","E","F",""])
-            self.y = random.choice([1,2,3,4,5,6])
-            self.direction = random.choice(["H","V"])
+            x = random.choice(["A","B","C","D","E","F",""])
+            y = str(random.choice([1,2,3,4,5,6]))
+            return x,y
 
 
     def __init__(self):
         self.game_board = [['-' for _ in range(6)] for _ in range(6)]
+        self.ai_board = [['-'for _ in range(6)] for _ in range(6)]
         self.ships = {"трёхпалубный": 3, "двухпалубный": 2, "однопалубный": 1}
         self.ships_count = {"трёхпалубный": 1, "двухпалубный": 2, "однопалубный": 4}
         self.letter_to_index = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5}
+        self.players=[self.Player("Игрок 1"),self.AIPlayer()]
     def print_gameboard(self):  # Вывод игрового поля в консоль
         columns = "  A B C D E F"
         print(columns)
@@ -101,7 +109,7 @@ class Game:
         return sum(row.count("X") for row in self.game_board)
     def take_shot(self):
         print("Введите координаты выстрела")
-        while True:
+        while self.counts_hit() <10:
             try:
                 x_letter = input("Введите букву (A-F): ").upper()
                 y_number = input("Введите цифру (1-6): ")
