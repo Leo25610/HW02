@@ -2,7 +2,8 @@ import random
 
 
 class BoardOutException(Exception):
-    pass
+    def __init__(self,message ='Выход за границы игрового поля'):
+        super.__init__(message)
 
 
 class Dot:
@@ -42,8 +43,7 @@ class Board:
         self.ships = []
         self.alive_ships = 0
 
-    def can_place_ship(self, ship):
-        """ Проверяет, можно ли разместить корабль с учетом расстояния в 1 клетку """
+    def can_place_ship(self, ship):              #Проверка на минимальное расстояние в 1 клетку
         for dot in ship.dots():
             if self.out(dot) or self.field[dot.x][dot.y] != '◯':
                 return False
@@ -77,7 +77,7 @@ class Board:
 
     def shot(self, dot):
         if self.out(dot):
-            raise ValueError("Выстрел за пределы поля!")
+            raise BoardOutException()
         if self.field[dot.x][dot.y] in ('X', 'T'):
             raise ValueError("В эту клетку уже стреляли!")
         for ship in self.ships:
@@ -112,6 +112,8 @@ class Player:
                 result = self.enemy_board.shot(target)
                 print(f"Выстрел по ({chr(target.y + 65)}{target.x + 1}) - {result}")
                 return result == "Попадание!"
+            except BoardOutException as e:
+                print(e)
             except ValueError as e:
                 print(e)
 
@@ -167,7 +169,7 @@ class Game:
                 break
             self.ai.move()
             if self.user_board.alive_ships == 0:
-                print("Компьютер победил!")
+                print("ИИ победил!")
                 break
 
     def start(self):
